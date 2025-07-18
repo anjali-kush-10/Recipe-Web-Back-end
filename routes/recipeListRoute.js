@@ -1,0 +1,18 @@
+import express from "express";
+import { authMiddleware } from "../utils/authJwtMiddleware.js";
+import { createRecipe, deleteRecipe, getRecipeList, updateRecipe } from "../controller/recipeListController.js";
+
+const router = express.Router();
+
+export const recipeRouter = () => {
+
+    router.get("/get-receipe-list", authMiddleware ,getRecipeList);
+
+    router.post("/create-recipe", authMiddleware, createRecipe);
+
+    router.patch("/update-recipe/:id", authMiddleware, updateRecipe);
+
+    router.delete("/delete-recipe/:id", authMiddleware, deleteRecipe);
+
+    return router;
+}
