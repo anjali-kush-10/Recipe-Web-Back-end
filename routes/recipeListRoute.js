@@ -1,6 +1,7 @@
 import express from "express";
 import { authMiddleware } from "../utils/authJwtMiddleware.js";
 import { createRecipe, deleteRecipe, getRecipeList, updateRecipe } from "../controller/recipeListController.js";
+import { createRecipeValidation, validate } from "../validations/recipeValidation.js";
 
 const router = express.Router();
 
@@ -8,7 +9,7 @@ export const recipeRouter = () => {
 
     router.get("/get-receipe-list", authMiddleware ,getRecipeList);
 
-    router.post("/create-recipe", authMiddleware, createRecipe);
+    router.post("/create-recipe", authMiddleware,createRecipeValidation,validate, createRecipe);
 
     router.patch("/update-recipe/:id", authMiddleware, updateRecipe);
 

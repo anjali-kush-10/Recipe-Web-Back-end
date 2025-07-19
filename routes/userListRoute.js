@@ -12,7 +12,7 @@ export const adminRouter = () => {
 
     router.post("/login", loginValidation, validate, Login);
     router.post("/verify-otp", verifyOtpValidation, validate, verifyOtp);
-    router.post("/complete-profile", userValidation, validate, authMiddleware, completeProfile);
+    router.post("/complete-profile",authMiddleware, userValidation, validate,  completeProfile);
 
     router.delete("/delete-profile/:id", authMiddleware, deleteProfile);
 
