@@ -1,6 +1,7 @@
 import { Op } from "sequelize";
 import Recipe from "../models/recipe.model.js";
 import dotenv from "dotenv";
+import recipe from "../models/recipe.model.js";
 dotenv.config();
 
 
@@ -14,7 +15,7 @@ export const getRecipeList = async (req, res) => {
                     {title:{[Op.like]:`%${search}%`}}
                 ]
             },
-            attributes: ['id', 'title', 'description']
+            attributes: ['id', 'title', 'description','instructions']
         });
         if (!findRecipes) {
             return res.status(404).json({ status: false, message: "Unable to fetch Recipes details" });
@@ -125,6 +126,37 @@ export const deleteRecipe = async (req, res) => {
     }
     catch (error) {
         console.log(error);
-        return res.status(500).json({ status: false, message: "Error in delete recipe" });
+        return res.status(500).json({ status: false, message: error.message });
+    }
+}
+
+
+export const readRecipe=async(req,res)=>{
+    try{
+        const user = req.user;
+        const {id}=req.params;
+
+        if (!user) {
+            return res.status(401).json({ status: false, message: "Unauthorized: No token or invalid token" });
+        }
+
+        const findRecipeById=await Recipe.findOne({
+            where:{
+                id:id
+            },
+            attributes:['id','title','description','instructions']
+        });
+
+        if(!findRecipeById){
+            return res.status(404).json({status:false, message:"Unable to find recipe"});
+        }
+        else{
+            return res.status(200).json({status:true, message:"Recipe found",findRecipeById});
+        }
+
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).json({ status: false, message: error.message });
     }
 }
