@@ -12,15 +12,15 @@ const PORT = process.env.PORT;
 
 // app.use(cors());
 app.use(cors({
-    origin: 'http://localhost:3000', // frontend origin
+    origin: 'http://localhost:3000', 
     credentials: true
 }));
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use('/user', adminRouter());
 app.use('/recipe', recipeRouter());
-
 
 app.listen(PORT);
 console.log("Server invoked at this port", PORT);

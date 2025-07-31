@@ -2,26 +2,35 @@ import { Op } from "sequelize";
 import Recipe from "../models/recipe.model.js";
 import dotenv from "dotenv";
 import recipe from "../models/recipe.model.js";
+import { getPaginationMeta, getPaginationParams } from "../utils/pagination.js";
 dotenv.config();
 
 
 export const getRecipeList = async (req, res) => {
     try {
         const search = req.query.search || "";
+        const { page, limit, skip } = getPaginationParams(req.query);
 
-        const findRecipes = await Recipe.findAll({
-            where:{
-                [Op.or]:[
-                    {title:{[Op.like]:`%${search}%`}}
+        const { count: total, rows: recipes } = await Recipe.findAndCountAll({
+            where: {
+                [Op.or]: [
+                    { title: { [Op.like]: `%${search}%` } }
                 ]
             },
-            attributes: ['id', 'title', 'description','instructions']
+            attributes: ['id', 'title', 'description', 'instructions'],
+            limit,
+            offset: skip
         });
-        if (!findRecipes) {
-            return res.status(404).json({ status: false, message: "Unable to fetch Recipes details" });
+
+
+        if (recipes.length === 0) {
+            return res.status(404).json({
+                status: false,
+                message: "No recipes found."
+            });
         }
         else {
-            return res.status(200).json({ status: true, message: "Recipes details found successfully", findRecipes });
+            return res.status(200).json({ status: true, message: "Recipes details found successfully", recipes, meta: getPaginationMeta(total, page, limit) });
         }
 
     }
@@ -131,31 +140,31 @@ export const deleteRecipe = async (req, res) => {
 }
 
 
-export const readRecipe=async(req,res)=>{
-    try{
+export const readRecipe = async (req, res) => {
+    try {
         const user = req.user;
-        const {id}=req.params;
+        const { id } = req.params;
 
         if (!user) {
             return res.status(401).json({ status: false, message: "Unauthorized: No token or invalid token" });
         }
 
-        const findRecipeById=await Recipe.findOne({
-            where:{
-                id:id
+        const findRecipeById = await Recipe.findOne({
+            where: {
+                id: id
             },
-            attributes:['id','title','description','instructions']
+            attributes: ['id', 'title', 'description', 'instructions']
         });
 
-        if(!findRecipeById){
-            return res.status(404).json({status:false, message:"Unable to find recipe"});
+        if (!findRecipeById) {
+            return res.status(404).json({ status: false, message: "Unable to find recipe" });
         }
-        else{
-            return res.status(200).json({status:true, message:"Recipe found",findRecipeById});
+        else {
+            return res.status(200).json({ status: true, message: "Recipe found", findRecipeById });
         }
 
     }
-    catch(error){
+    catch (error) {
         console.log(error);
         return res.status(500).json({ status: false, message: error.message });
     }
