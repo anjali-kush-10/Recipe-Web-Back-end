@@ -30,7 +30,7 @@ export const getRecipeList = async (req, res) => {
             });
         }
         else {
-            return res.status(200).json({ status: true, message: "Recipes details found successfully", recipes, meta: getPaginationMeta(total, page, limit) });
+            return res.status(200).json({ status: true, message: "Recipes details found successfully", recipes, pagination: getPaginationMeta(total, page, limit) });
         }
 
     }
